@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { extractTextFromPdfBuffer } from "../../../../lib/pdfExtract";
-import { renderHandwrittenPdf } from "../../../../lib/renderHandwritten";
-import { sanitizeFileName } from "../../../../lib/utils";
+import { extractTextFromPdfBuffer } from "../../../lib/pdfExtract";
+import { renderHandwrittenPdf } from "../../../lib/renderHandwritten";
+import { sanitizeFileName } from "../../../lib/utils";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
