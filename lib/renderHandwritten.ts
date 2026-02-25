@@ -1,5 +1,5 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import fontkit from "@pdf-lib/fontkit";
+import fontkit from "fontkit";
 import { splitToParagraphs, wrapParagraphToLines } from "./textWrap";
 import { clamp, hexToRgb, jitter, pickLineSpacing, safeNumber } from "./utils";
 
