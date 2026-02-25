@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { extractTextFromPdfBuffer } from "../../../lib/pdfExtract";
 import { renderHandwrittenPdf } from "../../../lib/renderHandwritten";
 import { sanitizeFileName } from "../../../lib/utils";
+
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
@@ -45,21 +46,18 @@ export async function POST(req: Request) {
         borderMargin,
         penColor,
         handStyle: handStyle as any,
-        fontSize
-      }
+        fontSize,
+      },
     });
 
+    // Response headers (define ONCE)
     const headers = new Headers();
     headers.set("Content-Type", "application/pdf");
     headers.set("Content-Disposition", `attachment; filename="${safeName}.pdf"`);
 
-    const headers = new Headers();
-    headers.set("Content-Type", "application/pdf");
-    headers.set("Content-Disposition", `attachment; filename="${safeName}.pdf"`);
     // ✅ Use Node Buffer to satisfy BodyInit typing in Node runtime
     const nodeBody = Buffer.from(outBytes);
     return new NextResponse(nodeBody, { status: 200, headers });
-    
   } catch (e: any) {
     return new NextResponse(e?.message || "Server error", { status: 500 });
   }
