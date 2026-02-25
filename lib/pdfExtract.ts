@@ -1,6 +1,8 @@
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
-
+// lib/pdfExtract.ts
 export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
+  // pdfjs-dist v4 uses ESM (.mjs). Import dynamically to avoid bundler issues.
+  const pdfjsLib: any = await import("pdfjs-dist/legacy/build/pdf.mjs");
+
   const loadingTask = pdfjsLib.getDocument({ data: buf });
   const pdf = await loadingTask.promise;
 
@@ -10,7 +12,10 @@ export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
 
-    const strings = content.items.map((item: any) => item.str);
+    const strings = content.items
+      .map((item: any) => (typeof item?.str === "string" ? item.str : ""))
+      .filter(Boolean);
+
     fullText += strings.join(" ") + "\n\n";
   }
 
