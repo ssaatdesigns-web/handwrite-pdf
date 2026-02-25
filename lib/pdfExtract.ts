@@ -1,14 +1,18 @@
-import pdfParse from "pdf-parse";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 
-/**
- * Extract text from a text-based PDF buffer.
- * Note: This will NOT OCR scanned/image PDFs.
- */
 export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
-  const data = await pdfParse(buf);
+  const loadingTask = pdfjsLib.getDocument({ data: buf });
+  const pdf = await loadingTask.promise;
 
-  const raw = (data.text || "").replace(/\r/g, "");
+  let fullText = "";
 
-  // Keep paragraph structure but remove excessive blank lines
-  return raw.replace(/\n{3,}/g, "\n\n").trim();
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+
+    const strings = content.items.map((item: any) => item.str);
+    fullText += strings.join(" ") + "\n\n";
+  }
+
+  return fullText.trim();
 }
