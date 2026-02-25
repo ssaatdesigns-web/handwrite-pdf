@@ -53,7 +53,8 @@ export async function POST(req: Request) {
     headers.set("Content-Type", "application/pdf");
     headers.set("Content-Disposition", `attachment; filename="${safeName}.pdf"`);
 
-    return new NextResponse(outBytes, { status: 200, headers });
+    const body = outBytes.buffer.slice(outBytes.byteOffset, outBytes.byteOffset + outBytes.byteLength);
+    return new NextResponse(body, { status: 200, headers });
   } catch (e: any) {
     return new NextResponse(e?.message || "Server error", { status: 500 });
   }
