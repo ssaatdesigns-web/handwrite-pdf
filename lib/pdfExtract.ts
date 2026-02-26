@@ -1,12 +1,17 @@
 // lib/pdfExtract.ts
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
-
 export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
+  const pdfjsLib: any = await import("pdfjs-dist/legacy/build/pdf.mjs");
+
+  // ✅ Make worker resolvable in Next/Vercel bundles
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/legacy/build/pdf.worker.mjs",
+    import.meta.url
+  ).toString();
+
   const uint8 = new Uint8Array(buf);
 
-  const loadingTask = (pdfjsLib as any).getDocument({
-    data: uint8,
-    disableWorker: true // ✅ critical for Vercel
+  const loadingTask = pdfjsLib.getDocument({
+    data: uint8
   });
 
   const pdf = await loadingTask.promise;
@@ -18,7 +23,7 @@ export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
     const content = await page.getTextContent();
 
     const strings = content.items
-      .map((item: any) => (typeof item?.str === "string" ? item.str : ""))
+      .map((it: any) => (typeof it?.str === "string" ? it.str : ""))
       .filter(Boolean);
 
     fullText += strings.join(" ") + "\n\n";
