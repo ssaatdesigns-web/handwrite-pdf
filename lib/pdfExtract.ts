@@ -1,13 +1,12 @@
 // lib/pdfExtract.ts
-export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
-  const pdfjsLib: any = await import("pdfjs-dist/legacy/build/pdf.mjs");
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 
-  // ✅ PDF.js on serverless: disable worker (prevents fake worker error)
+export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
   const uint8 = new Uint8Array(buf);
 
-  const loadingTask = pdfjsLib.getDocument({
+  const loadingTask = (pdfjsLib as any).getDocument({
     data: uint8,
-    disableWorker: true
+    disableWorker: true // ✅ critical for Vercel
   });
 
   const pdf = await loadingTask.promise;
