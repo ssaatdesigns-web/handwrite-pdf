@@ -2,13 +2,18 @@
 export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
   const pdfjsLib: any = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-  // ✅ Convert Buffer -> Uint8Array (required)
+  // ✅ Hard-disable workers (global + per-document)
+  if (pdfjsLib.GlobalWorkerOptions) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "";   // prevents pdf.worker.mjs lookup
+    pdfjsLib.GlobalWorkerOptions.workerPort = null;
+  }
+
   const uint8 = new Uint8Array(buf);
 
-  // ✅ Hard-disable workers (prevents fake-worker and prevents worker bundling)
   const loadingTask = pdfjsLib.getDocument({
     data: uint8,
     disableWorker: true,
+    useWorkerFetch: false
   });
 
   const pdf = await loadingTask.promise;
