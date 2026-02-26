@@ -2,16 +2,13 @@
 export async function extractTextFromPdfBuffer(buf: Buffer): Promise<string> {
   const pdfjsLib: any = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-  // ✅ Make worker resolvable in Next/Vercel bundles
-  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/legacy/build/pdf.worker.mjs",
-    import.meta.url
-  ).toString();
-
+  // ✅ Convert Buffer -> Uint8Array (required)
   const uint8 = new Uint8Array(buf);
 
+  // ✅ Hard-disable workers (prevents fake-worker and prevents worker bundling)
   const loadingTask = pdfjsLib.getDocument({
-    data: uint8
+    data: uint8,
+    disableWorker: true,
   });
 
   const pdf = await loadingTask.promise;
